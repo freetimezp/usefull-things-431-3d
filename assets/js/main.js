@@ -22,85 +22,136 @@ document.addEventListener("DOMContentLoaded", () => {
     gsap.ticker.lagSmoothing(0);
 
     /* =========================================================
-   UNUSUAL CANVAS FOOTER REVEAL
+   LIQUID SECTION REVEALS
 ========================================================= */
 
-    const revealCanvas = document.getElementById("footer-reveal");
-    const revealCtx = revealCanvas.getContext("2d");
+    const revealCanvases = [
+        ...document.querySelectorAll(".section-reveal"),
+        document.getElementById("footer-reveal"),
+    ].filter(Boolean);
 
-    let revealWidth = 0;
-    let revealHeight = 0;
+    const reveals = [];
 
-    const reveal = {
-        progress: 0,
-        target: 0,
-        time: 0,
-    };
+    const revealColors = [
+        "#d0e2b0", // section 1
+        "#58059b", // section 2
+        "#e08a1a", // section 3
+        "#050505", // footer
+    ];
 
-    function resizeRevealCanvas() {
-        const rect = revealCanvas.getBoundingClientRect();
+    revealCanvases.forEach((canvas, index) => {
+        const ctx = canvas.getContext("2d");
 
-        revealWidth = rect.width;
-        revealHeight = rect.height;
+        const reveal = {
+            canvas,
+            ctx,
 
-        const dpr = Math.min(window.devicePixelRatio, 2);
+            width: 0,
+            height: 0,
 
-        revealCanvas.width = revealWidth * dpr;
-        revealCanvas.height = revealHeight * dpr;
+            progress: 0,
+            target: 0,
 
-        revealCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            time: Math.random() * 10,
+
+            color: revealColors[index] || "#080808",
+        };
+
+        reveals.push(reveal);
+    });
+
+    /* =========================================================
+   RESIZE
+========================================================= */
+
+    function resizeReveal(reveal) {
+        const rect = reveal.canvas.getBoundingClientRect();
+
+        reveal.width = rect.width;
+        reveal.height = rect.height;
+
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+        reveal.canvas.width = reveal.width * dpr;
+
+        reveal.canvas.height = reveal.height * dpr;
+
+        reveal.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
 
-    resizeRevealCanvas();
+    reveals.forEach(resizeReveal);
 
-    window.addEventListener("resize", resizeRevealCanvas);
+    /* ---------------------------------------------------------
+       GET SECTION BACKGROUND
+    --------------------------------------------------------- */
 
-    function drawReveal() {
+    function getRevealColor(element) {
+        const computed = getComputedStyle(element);
+
+        const backgroundColor = computed.backgroundColor;
+
+        /*
+         * For the footer we want the dark base color
+         * instead of the radial-gradient.
+         */
+
+        if (element.tagName === "FOOTER") {
+            return "#080808";
+        }
+
+        return backgroundColor;
+    }
+
+    /* ---------------------------------------------------------
+       DRAW LIQUID REVEAL
+    --------------------------------------------------------- */
+    /* =========================================================
+   DRAW
+========================================================= */
+
+    function drawReveal(reveal) {
+        const { ctx, width, height } = reveal;
+
         reveal.time += 0.025;
 
         reveal.progress += (reveal.target - reveal.progress) * 0.08;
 
-        const ctx = revealCtx;
-
-        ctx.clearRect(0, 0, revealWidth, revealHeight);
+        ctx.clearRect(0, 0, width, height);
 
         /*
-         * Dark curtain
+         * Colored curtain
          */
 
-        ctx.fillStyle = "#050505";
+        ctx.fillStyle = reveal.color;
 
-        ctx.fillRect(0, 0, revealWidth, revealHeight);
+        ctx.fillRect(0, 0, width, height);
 
         /*
-         * Reveal width
+         * Opening grows from center
          */
 
-        const revealWidthAmount =
-            revealWidth * (0.015 + reveal.progress * 1.15);
+        const opening = width * (0.02 + reveal.progress * 1.2);
 
-        const centerX = revealWidth * 0.5;
+        const centerX = width * 0.5;
 
-        /*
-         * Liquid vertical opening
-         */
-
-        const points = 160;
+        const points = 180;
 
         ctx.save();
 
         ctx.beginPath();
 
+        /* LEFT EDGE */
+
         for (let i = 0; i <= points; i++) {
             const t = i / points;
 
-            const y = t * revealHeight;
+            const y = t * height;
 
             const wave = Math.sin(t * 12 + reveal.time) * 20;
 
-            const wave2 = Math.sin(t * 27 - reveal.time * 1.5) * 8;
+            const wave2 = Math.sin(t * 28 - reveal.time * 1.4) * 9;
 
-            const edge = revealWidthAmount * 0.5 + wave + wave2;
+            const edge = opening * 0.5 + wave + wave2;
 
             const x = centerX - edge;
 
@@ -111,16 +162,18 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
 
+        /* RIGHT EDGE */
+
         for (let i = points; i >= 0; i--) {
             const t = i / points;
 
-            const y = t * revealHeight;
+            const y = t * height;
 
             const wave = Math.sin(t * 12 + reveal.time) * 20;
 
-            const wave2 = Math.sin(t * 27 - reveal.time * 1.5) * 8;
+            const wave2 = Math.sin(t * 28 - reveal.time * 1.4) * 9;
 
-            const edge = revealWidthAmount * 0.5 + wave + wave2;
+            const edge = opening * 0.5 + wave + wave2;
 
             const x = centerX + edge;
 
@@ -130,7 +183,7 @@ document.addEventListener("DOMContentLoaded", () => {
         ctx.closePath();
 
         /*
-         * Cut the reveal from the black curtain
+         * Remove center
          */
 
         ctx.globalCompositeOperation = "destination-out";
@@ -138,17 +191,17 @@ document.addEventListener("DOMContentLoaded", () => {
         ctx.fill();
 
         /*
-         * Bright edge
+         * Bright liquid edge
          */
 
         ctx.globalCompositeOperation = "source-over";
 
         ctx.strokeStyle = `rgba(
-            255,
-            255,
-            255,
-            ${0.15 * (1 - reveal.progress)}
-        )`;
+        255,
+        255,
+        255,
+        ${0.2 * (1 - reveal.progress)}
+    )`;
 
         ctx.lineWidth = 1;
 
@@ -156,6 +209,30 @@ document.addEventListener("DOMContentLoaded", () => {
 
         ctx.restore();
     }
+
+    /* ---------------------------------------------------------
+       REVEAL SCROLL TRIGGERS
+    --------------------------------------------------------- */
+    revealCanvases.forEach((canvas, index) => {
+        const reveal = reveals[index];
+
+        const section = canvas.closest(".section, footer");
+
+        if (!section) return;
+
+        ScrollTrigger.create({
+            trigger: section,
+
+            start: "top bottom",
+            end: "top top",
+
+            scrub: 1,
+
+            onUpdate: (self) => {
+                reveal.target = self.progress;
+            },
+        });
+    });
 
     /* =========================================================
        SECTION REVEALS
@@ -165,7 +242,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     sections.forEach((section) => {
         const title = section.querySelector("h1");
+
         const paragraph = section.querySelector("p");
+
         const index = section.querySelector(".section-index");
 
         gsap.set(title, {
@@ -186,8 +265,10 @@ document.addEventListener("DOMContentLoaded", () => {
         const tl = gsap.timeline({
             scrollTrigger: {
                 trigger: section,
+
                 start: "top 70%",
                 end: "top 20%",
+
                 toggleActions: "play none none reverse",
             },
         });
@@ -195,7 +276,9 @@ document.addEventListener("DOMContentLoaded", () => {
         tl.to(index, {
             y: 0,
             opacity: 0.6,
+
             duration: 0.7,
+
             ease: "power3.out",
         })
             .to(
@@ -203,7 +286,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 {
                     y: 0,
                     opacity: 1,
+
                     duration: 1.2,
+
                     ease: "power4.out",
                 },
                 "-=0.4",
@@ -213,13 +298,17 @@ document.addEventListener("DOMContentLoaded", () => {
                 {
                     y: 0,
                     opacity: 0.5,
+
                     duration: 0.8,
+
                     ease: "power3.out",
                 },
                 "-=0.7",
             );
 
-        /* subtle parallax */
+        /* -----------------------------------------------------
+           TITLE PARALLAX
+        ----------------------------------------------------- */
 
         gsap.to(title, {
             yPercent: -12,
@@ -228,8 +317,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
             scrollTrigger: {
                 trigger: section,
+
                 start: "top bottom",
                 end: "bottom top",
+
                 scrub: true,
             },
         });
@@ -240,6 +331,7 @@ document.addEventListener("DOMContentLoaded", () => {
     ========================================================= */
 
     const footer = document.querySelector("footer");
+
     const footerContainer = document.querySelector(".footer-container");
 
     const footerContent = document.querySelector("#footer-content");
@@ -250,7 +342,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const footerBottom = document.querySelector(".footer-bottom");
 
-    /* Initial footer state */
+    /* ---------------------------------------------------------
+       INITIAL FOOTER STATE
+    --------------------------------------------------------- */
 
     gsap.set(footerIntro, {
         y: 100,
@@ -267,13 +361,17 @@ document.addEventListener("DOMContentLoaded", () => {
         opacity: 0,
     });
 
-    /* Main footer reveal */
+    /* ---------------------------------------------------------
+       FOOTER REVEAL
+    --------------------------------------------------------- */
 
     const footerTimeline = gsap.timeline({
         scrollTrigger: {
             trigger: footer,
+
             start: "top 90%",
             end: "top 25%",
+
             scrub: 1,
         },
     });
@@ -283,7 +381,9 @@ document.addEventListener("DOMContentLoaded", () => {
             footerContainer,
             {
                 y: "0%",
+
                 duration: 1,
+
                 ease: "power3.out",
             },
             0,
@@ -293,7 +393,9 @@ document.addEventListener("DOMContentLoaded", () => {
             {
                 y: 0,
                 opacity: 1,
+
                 duration: 0.8,
+
                 ease: "power3.out",
             },
             0.2,
@@ -303,7 +405,9 @@ document.addEventListener("DOMContentLoaded", () => {
             {
                 y: 0,
                 opacity: 1,
+
                 duration: 0.8,
+
                 ease: "power3.out",
             },
             0.35,
@@ -313,13 +417,17 @@ document.addEventListener("DOMContentLoaded", () => {
             {
                 y: 0,
                 opacity: 1,
+
                 duration: 0.6,
+
                 ease: "power3.out",
             },
             0.55,
         );
 
-    /* Footer subtle scale */
+    /* ---------------------------------------------------------
+       FOOTER SCALE
+    --------------------------------------------------------- */
 
     gsap.fromTo(
         footerContent,
@@ -328,12 +436,15 @@ document.addEventListener("DOMContentLoaded", () => {
         },
         {
             scale: 1,
+
             ease: "none",
 
             scrollTrigger: {
                 trigger: footer,
+
                 start: "top bottom",
                 end: "top 20%",
+
                 scrub: true,
             },
         },
@@ -349,22 +460,27 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const camera = new THREE.PerspectiveCamera(
         45,
+
         container.clientWidth / container.clientHeight,
+
         0.1,
         100,
     );
 
     camera.position.set(0, 0, 1.9);
 
-    /* Renderer */
+    /* ---------------------------------------------------------
+       RENDERER
+    --------------------------------------------------------- */
 
     const renderer = new THREE.WebGLRenderer({
         alpha: true,
         antialias: true,
+
         powerPreference: "high-performance",
     });
 
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
 
     renderer.setSize(container.clientWidth, container.clientHeight);
 
@@ -418,7 +534,9 @@ document.addEventListener("DOMContentLoaded", () => {
         (gltf) => {
             model = gltf.scene;
 
-            /* center model */
+            /* -------------------------------------------------
+               CENTER MODEL
+            ------------------------------------------------- */
 
             const box = new THREE.Box3().setFromObject(model);
 
@@ -428,7 +546,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
             model.position.sub(center);
 
-            /* normalize model */
+            /* -------------------------------------------------
+               NORMALIZE MODEL
+            ------------------------------------------------- */
 
             const maxDimension = Math.max(size.x, size.y, size.z);
 
@@ -444,18 +564,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
             model.rotation.set(modelBaseRotationX, 0, 0);
 
-            /* save original materials */
+            /* -------------------------------------------------
+               MATERIALS
+            ------------------------------------------------- */
 
             model.traverse((child) => {
                 if (child.isMesh) {
                     child.castShadow = true;
+
                     child.receiveShadow = true;
                 }
             });
 
             scene.add(model);
 
-            /* entrance */
+            /* -------------------------------------------------
+               ENTRANCE
+            ------------------------------------------------- */
 
             gsap.from(model.scale, {
                 x: 0,
@@ -468,6 +593,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 scrollTrigger: {
                     trigger: footer,
+
                     start: "top 80%",
                 },
             });
@@ -481,6 +607,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 scrollTrigger: {
                     trigger: footer,
+
                     start: "top 80%",
                 },
             });
@@ -518,7 +645,18 @@ document.addEventListener("DOMContentLoaded", () => {
         onUpdate: (self) => {
             const progress = self.progress;
 
-            reveal.target = progress;
+            /*
+             * Footer reveal is now controlled
+             * by the generic reveal system.
+             */
+
+            const footerReveal = reveals.find(
+                (item) => item.canvas.id === "footer-reveal",
+            );
+
+            if (footerReveal) {
+                footerReveal.target = progress;
+            }
 
             if (model) {
                 model.position.y = -0.15 + progress * 0.15;
@@ -539,22 +677,32 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const elapsed = clock.getElapsedTime();
 
-        /* smooth mouse */
+        /* -----------------------------------------------------
+           REVEALS
+        ----------------------------------------------------- */
+
+        reveals.forEach((reveal) => {
+            drawReveal(reveal);
+        });
+
+        /* -----------------------------------------------------
+           SMOOTH MOUSE
+        ----------------------------------------------------- */
 
         mouse.x += (targetMouse.x - mouse.x) * 0.035;
 
         mouse.y += (targetMouse.y - mouse.y) * 0.035;
 
         if (model) {
-            /*
-             * Automatic idle rotation
-             */
+            /* -----------------------------------------------
+               IDLE ROTATION
+            ----------------------------------------------- */
 
             const idleRotation = Math.sin(elapsed * 0.45) * 0.12;
 
-            /*
-             * Mouse interaction
-             */
+            /* -----------------------------------------------
+               MOUSE ROTATION
+            ----------------------------------------------- */
 
             const targetRotationY = mouse.x * 0.55 + idleRotation;
 
@@ -564,9 +712,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
             model.rotation.x += (targetRotationX - model.rotation.x) * 0.04;
 
-            /*
-             * Floating movement
-             */
+            /* -----------------------------------------------
+               FLOATING
+            ----------------------------------------------- */
 
             const floatingY = Math.sin(elapsed * 1.1) * 0.035;
 
@@ -576,16 +724,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
             model.position.z += (floatingZ - model.position.z) * 0.04;
 
-            /*
-             * Slight footer scroll movement
-             */
+            /* -----------------------------------------------
+               MOUSE X MOVEMENT
+            ----------------------------------------------- */
 
             model.position.x += (mouse.x * 0.08 - model.position.x) * 0.02;
         }
 
-        /*
-         * Camera reacts very subtly to mouse
-         */
+        /* -----------------------------------------------------
+           CAMERA MOUSE REACTION
+        ----------------------------------------------------- */
 
         camera.position.x += (mouse.x * 0.08 - camera.position.x) * 0.02;
 
@@ -598,8 +746,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     animate();
 
+    /* =========================================================
+   REVEAL LOOP
+========================================================= */
+
     function revealAnimation() {
-        drawReveal();
+        reveals.forEach(drawReveal);
 
         requestAnimationFrame(revealAnimation);
     }
@@ -611,7 +763,18 @@ document.addEventListener("DOMContentLoaded", () => {
     ========================================================= */
 
     window.addEventListener("resize", () => {
+        /* -----------------------------------------------
+               REVEAL CANVASES
+            ----------------------------------------------- */
+
+        reveals.forEach(resizeReveal);
+
+        /* -----------------------------------------------
+               THREE.JS
+            ----------------------------------------------- */
+
         const width = container.clientWidth;
+
         const height = container.clientHeight;
 
         camera.aspect = width / height;
@@ -620,9 +783,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
         renderer.setSize(width, height);
 
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
 
         ScrollTrigger.refresh();
+
         location.reload();
     });
 
@@ -631,6 +795,8 @@ document.addEventListener("DOMContentLoaded", () => {
     ========================================================= */
 
     window.addEventListener("load", () => {
+        reveals.forEach(resizeReveal);
+
         ScrollTrigger.refresh();
     });
 });
