@@ -1,42 +1,69 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
         <link rel="icon" href="/vite.svg" type="image/svg+xml" />
-        <link rel="stylesheet" href="./src/assets/css/style.css" />
-        <title>Project</title>
+
+        <link rel="stylesheet" href="./assets/css/style.css" />
+
+        <title>Drone — 3D Footer Experience</title>
     </head>
 
     <body>
-        <section class="one">
-            <h1>Section 1</h1>
-        </section>
+        <main>
+            <section class="section section-one">
+                <div class="section-inner">
+                    <span class="section-index">01 / 03</span>
+                    <h1>Section 1</h1>
+                    <p>Scroll to explore.</p>
+                </div>
+            </section>
 
-        <section class="two">
-            <h1>Section 2</h1>
-        </section>
+            <section class="section section-two">
+                <div class="section-inner">
+                    <span class="section-index">02 / 03</span>
+                    <h1>Section 2</h1>
+                    <p>A quiet transition.</p>
+                </div>
+            </section>
 
-        <section class="three">
-            <h1>Section 3</h1>
-        </section>
+            <section class="section section-three">
+                <div class="section-inner">
+                    <span class="section-index">03 / 03</span>
+                    <h1>Section 3</h1>
+                    <p>Something is waiting below.</p>
+                </div>
+            </section>
+        </main>
 
         <footer>
+            <canvas id="footer-reveal"></canvas>
+
+            <div class="footer-glow"></div>
+            <div class="footer-grid"></div>
+
             <div class="footer-container">
                 <div id="footer-canvas"></div>
 
                 <div id="footer-content">
-                    <div class="footer-row">
-                        <div class="footer-col">
-                            <h2>Lorem ipsum dolor sit amet consectetur adipisicing.</h2>
+                    <div class="footer-top">
+                        <div class="footer-intro">
+                            <span class="footer-label"
+                                >FINAL / TRANSMISSION</span
+                            >
+
+                            <h2>Assault drone concept</h2>
                         </div>
 
-                        <div class="footer-col">
+                        <div class="footer-links">
                             <div class="footer-sub-col">
-                                <h3>Work</h3>
-                                <h3>2026</h3>
+                                <span>WORK</span>
+                                <span>2026</span>
                             </div>
+
                             <div class="footer-sub-col">
                                 <a href="#">Write to me</a>
                                 <a href="#">Professional orbit</a>
@@ -46,14 +73,33 @@
                         </div>
                     </div>
 
-                    <div class="footer-row">
+                    <div class="footer-bottom">
                         <p>Project Idea</p>
-                        <p>Build with 3D</p>
+
+                        <div class="footer-status">
+                            <span class="status-dot"></span>
+                            <span>BUILD WITH 3D</span>
+                        </div>
+
+                        <p>Scroll / Move / Explore</p>
                     </div>
                 </div>
             </div>
         </footer>
 
-        <script type="module" src="./src/assets/js/main.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.15.0/gsap.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.15.0/ScrollTrigger.min.js"></script>
+        <script src="https://unpkg.com/lenis@1.3.26/dist/lenis.min.js"></script>
+
+        <script type="importmap">
+            {
+                "imports": {
+                    "three": "https://cdnjs.cloudflare.com/ajax/libs/three.js/0.185.1/three.module.min.js",
+                    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.185.1/examples/jsm/"
+                }
+            }
+        </script>
+
+        <script type="module" src="./assets/js/main.js"></script>
     </body>
 </html>

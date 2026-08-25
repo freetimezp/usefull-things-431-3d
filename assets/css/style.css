@@ -1,0 +1,432 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    list-style: none;
+}
+
+html {
+    scroll-behavior: auto;
+}
+
+body {
+    width: 100%;
+    background: #171717;
+    color: #fff;
+    font-family: Arial, Helvetica, sans-serif;
+    overflow-x: hidden;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+h1,
+h2,
+h3,
+p {
+    font-weight: 400;
+}
+
+h1 {
+    font-size: clamp(4rem, 11vw, 12rem);
+    line-height: 0.9;
+    letter-spacing: -0.07em;
+}
+
+h2 {
+    font-size: clamp(2.5rem, 5vw, 6rem);
+    line-height: 0.95;
+    letter-spacing: -0.05em;
+}
+
+p {
+    font-size: 0.9rem;
+}
+
+/* ------------------------------
+   SECTIONS
+------------------------------ */
+
+.section {
+    position: relative;
+    width: 100%;
+    height: 100svh;
+    padding: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.section-inner {
+    position: relative;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.section-index {
+    position: absolute;
+    top: -4rem;
+    left: 0;
+
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    opacity: 0.6;
+}
+
+.section-inner p {
+    margin-top: 2rem;
+    opacity: 0.5;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-size: 0.65rem;
+}
+
+.section-one {
+    background: #e6eed6;
+    color: #111;
+}
+
+.section-two {
+    background: #6200b3;
+    color: #fff;
+}
+
+.section-three {
+    background: #ffa630;
+    color: #111;
+}
+
+/* subtle oversized background numbers */
+
+.section::after {
+    content: attr(data-number);
+    position: absolute;
+    right: -5vw;
+    bottom: -12vw;
+
+    font-size: 35vw;
+    line-height: 1;
+
+    opacity: 0.04;
+    pointer-events: none;
+}
+
+/* ------------------------------
+   FOOTER
+------------------------------ */
+
+footer {
+    position: relative;
+    width: 100%;
+    height: 100svh;
+
+    background:
+        radial-gradient(
+            circle at 50% 45%,
+            rgba(255, 255, 255, 0.07),
+            transparent 30%
+        ),
+        #080808;
+
+    color: #fff;
+    overflow: hidden;
+}
+
+.footer-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+
+    padding: 2rem;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    transform: translateY(28%);
+    will-change: transform;
+}
+
+/* ------------------------------
+   FOOTER CANVAS
+------------------------------ */
+
+#footer-canvas {
+    position: absolute;
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    pointer-events: none;
+
+    z-index: 0;
+}
+
+#footer-canvas canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+/* ------------------------------
+   AMBIENT EFFECTS
+------------------------------ */
+
+.footer-glow {
+    position: absolute;
+
+    width: 50vw;
+    height: 50vw;
+
+    left: 50%;
+    top: 45%;
+
+    transform: translate(-50%, -50%);
+
+    background: radial-gradient(
+        circle,
+        rgba(255, 255, 255, 0.08),
+        transparent 65%
+    );
+
+    filter: blur(30px);
+
+    pointer-events: none;
+}
+
+.footer-grid {
+    position: absolute;
+    inset: 0;
+
+    background-image:
+        linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+
+    background-size: 80px 80px;
+
+    mask-image: radial-gradient(circle at center, black, transparent 75%);
+
+    pointer-events: none;
+}
+
+/* ------------------------------
+   FOOTER CONTENT
+------------------------------ */
+
+#footer-content {
+    position: relative;
+
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    z-index: 2;
+
+    pointer-events: none;
+}
+
+.footer-top {
+    display: flex;
+    justify-content: space-between;
+
+    gap: 4rem;
+}
+
+.footer-intro {
+    width: 55%;
+}
+
+.footer-label {
+    display: block;
+
+    margin-bottom: 2rem;
+
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+
+    opacity: 0.45;
+}
+
+.footer-intro h2 {
+    max-width: 900px;
+}
+
+.footer-links {
+    width: 35%;
+
+    display: flex;
+    gap: 3rem;
+
+    padding-top: 0.5rem;
+}
+
+.footer-sub-col {
+    flex: 1;
+
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+}
+
+.footer-sub-col span {
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    opacity: 0.45;
+}
+
+.footer-sub-col a {
+    font-size: clamp(1rem, 1.5vw, 1.5rem);
+    line-height: 1.1;
+
+    pointer-events: auto;
+
+    transition:
+        opacity 0.3s ease,
+        transform 0.3s ease;
+}
+
+.footer-sub-col a:hover {
+    opacity: 0.5;
+    transform: translateX(8px);
+}
+
+.footer-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding-top: 1rem;
+
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.footer-bottom p,
+.footer-status {
+    font-size: 0.65rem;
+
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+
+    opacity: 0.45;
+}
+
+.footer-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.status-dot {
+    width: 6px;
+    height: 6px;
+
+    border-radius: 50%;
+
+    background: #fff;
+
+    animation: statusPulse 1.5s ease-in-out infinite;
+}
+
+#footer-reveal {
+    position: absolute;
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    z-index: 10;
+
+    pointer-events: none;
+}
+
+.footer-glow,
+.footer-grid,
+.footer-container {
+    z-index: 1;
+}
+
+#footer-canvas {
+    z-index: 0;
+}
+
+@keyframes statusPulse {
+    0%,
+    100% {
+        opacity: 0.25;
+        transform: scale(0.8);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* ------------------------------
+   RESPONSIVE
+------------------------------ */
+
+@media (max-width: 1000px) {
+    .section {
+        padding: 1.5rem;
+    }
+
+    .footer-container {
+        padding: 1.5rem;
+    }
+
+    .footer-top {
+        flex-direction: column;
+
+        gap: 3rem;
+    }
+
+    .footer-intro,
+    .footer-links {
+        width: 100%;
+    }
+
+    .footer-links {
+        gap: 2rem;
+    }
+}
+
+@media (max-width: 600px) {
+    .section-index {
+        position: static;
+        margin-bottom: 1.5rem;
+    }
+
+    .footer-container {
+        transform: translateY(20%);
+    }
+
+    .footer-links {
+        gap: 1.5rem;
+    }
+
+    .footer-sub-col a {
+        font-size: 0.95rem;
+    }
+
+    .footer-bottom {
+        gap: 1rem;
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .footer-grid {
+        background-size: 45px 45px;
+    }
+}
